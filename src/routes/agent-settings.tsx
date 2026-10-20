@@ -353,9 +353,8 @@ export function AgentSettingsScreen({
   const { data: schema } = useAgentSettingsSchema(
     settings?.agent_settings_schema,
   );
-  const acpProviders = getAcpProvidersForBackend(
-    useActiveBackend().backend.kind,
-  );
+  const backendKind = useActiveBackend().backend.kind;
+  const acpProviders = getAcpProvidersForBackend(backendKind);
 
   const fields = React.useMemo(
     () => schema?.sections.flatMap((section) => section.fields),
@@ -675,8 +674,8 @@ export function AgentSettingsScreen({
   }, [initialSecretRefs]);
 
   // --- Condenser and verification (OpenHands; stored on the profile) ---
-  // `default` launches from the global settings, so its own copy would be ignored.
-  const behaviorEditable = !isDefaultProfile;
+  // A local `default` launches from the global settings, so its own copy would be ignored.
+  const behaviorEditable = !isDefaultProfile || backendKind === "cloud";
   const [behaviorControls, setBehaviorControls] = useState<
     Partial<Record<ProfileBehaviorSection, SdkSectionSaveControl>>
   >({});
